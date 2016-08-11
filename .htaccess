@@ -1,0 +1,18 @@
+<IfModule mod_rewrite.c>
+
+Options +FollowSymLinks
+RewriteEngine On
+#If directory or file does not exist forward request to index.php
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+
+</IfModule>
+
+<FilesMatch ".(jpg|jpeg|jpe|jif|jfif|jfi|png|gif|wbmp)">
+        Header set Access-Control-Allow-Origin "*"
+        Header set Cache-Control "max-age=2592000, public"
+</FilesMatch>
+ 
