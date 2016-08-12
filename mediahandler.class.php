@@ -1,32 +1,29 @@
 <?php 
 /**
  * Trieda MediaHandler pre spracovanie požiadavky na multimediálny súbor
- * 
- * @author Folcon, s.r.o. < developer@folcon.sk > 
- * @link http://www.folcon.sk/
- * @version 1.2 Cute Genie
- * @since Subor je súčasťou aplikácie od verzie 1.2
- * @package media
- * 
- */ 
+ *  
+ * @author     Matus Macak <matus.macak@orchidsphere.com>
+ * @copyright  2016 OrchidSphere
+ * @link       http://orchidsphere.com/
+ * @license    License here
+ * @version    1.0.0
+ */
 
 class MediaHandler {
     
     /**
      * Metóda generuje multimediálny výstup vo formáte image/gif, image/jpeg, image/png
      * 
-     * @param String $filename Názov súboru
+     * @param string $filename Názov súboru
+     * @param string $size (image_bank, large, medium, small)
      * @return bool TRUE pri uspešnom zobrazení obrázku (požadovaný alebo default), FALSE pri chybe
      */
-    public function image_handle($filename){
+    public function image_handle($filename, $size = NULL){
                
         $this->file_type($filename, $ftype, $ctype);
         header('Content-type: ' . $ctype);
         header('Cache-Control: max-age=86400');
         
-        $size   = filter_input(INPUT_GET, 's', FILTER_SANITIZE_ENCODED);
-//        $width  = filter_input(INPUT_GET, 'w', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
-//        $height = filter_input(INPUT_GET, 'h', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
         $wmflag  = 0;
         
         if(!empty($size) && ($fpath = $this->file_find($filename, $size)) !== FALSE){
@@ -53,15 +50,7 @@ class MediaHandler {
             }
         }
         
-        /** Resize
-         * @deprecated We do not resize
-        if(isset($width) || isset($height)){
-            $im = $this->image_resize($im, $width, $height);
-        }
-        */
-        
         //** Save
-
         empty($size)? $size = 'image_bank' : FALSE;
         $filepath = __DIR__ . '/files/' . $size . '/' . $filename;
         

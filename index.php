@@ -19,5 +19,7 @@ define('MEDIA_PATH_DEFAULT_IMAGE', __DIR__. '/include/default.png');
 require_once 'mediahandler.class.php';
 $mh = new MediaHandler();
 
-$fn = urldecode(basename(array_shift((explode('?', $_SERVER['REQUEST_URI'])))));
-$mh->image_handle($fn);
+$req_uri = strpos($_SERVER['REQUEST_URI'], '?') == 0? $_SERVER['REQUEST_URI'] : substr($_SERVER['REQUEST_URI'], 0, strpos($_SERVER['REQUEST_URI'], '?'));
+$request = explode('/', str_replace('/files/','',$req_uri));
+
+$mh->image_handle(...array_reverse($request));
