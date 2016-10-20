@@ -105,7 +105,7 @@ class MediaHandler {
                 break;
             case "jpeg":
             case "jpg": 
-                    @imagejpeg($im,$filepath);
+                    @imagejpeg($im, $filepath, 100);
                     imagejpeg($im);
                 break;
             case "png": 
