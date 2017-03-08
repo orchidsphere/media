@@ -110,7 +110,7 @@ class MediaHandler {
                 break;
             case "png": 
             default:
-                    @imagepng($im, $filepath);
+                    @imagepng($im, $filepath, 9);
                     imagepng($im);
                 break;
         }
