@@ -26,13 +26,19 @@ class MediaHandler {
         
         $wmflag  = 0;
         
-        if(!empty($size) && ($fpath = $this->file_find($filename, $size)) !== FALSE){
+        if(($fpath = $this->file_find($filename, $size)) !== FALSE){
             $im = $this->image_create($fpath, $ftype);
-            $wmflag = ($size == 'large')? 2 : 0;
-        }
-        elseif(($fpath = $this->file_find($filename, 'image_bank')) !== FALSE){
-            $im = $this->image_create($fpath, $ftype);
-            $wmflag = 1;
+            switch ($size){
+            	case 'large':
+            		$wmflag = 2;
+            		break;
+            	case 'image_bank':
+            		$wmflag = 1;
+            		break;
+            	default:
+            		$wmflag = 0;
+            		break;
+            }
         }
         else{
             readfile(MEDIA_PATH_DEFAULT_IMAGE);
@@ -94,7 +100,7 @@ class MediaHandler {
     /**
      * Vhodnou funkciou pošle obrázok na output, zároveň uloží ako statický obsah
      * @param resource $im Zdroj obrázku
-     * @param String $filetype Typ súboru
+     * @param string $filetype Typ súboru
      */
     private function image_output(&$im, $filetype, $filepath){
         
@@ -119,7 +125,7 @@ class MediaHandler {
     /**
      * Na obrázok pridá vodoznak
      * @param resource $im Zdroj obrázku, na ktorý sa pridá vodoznak
-     * @param String $wm_path Cesta ku PNG súboru s vodznakom
+     * @param string $wm_path Cesta ku PNG súboru s vodznakom
      */
     private function image_watermark(&$im, $wm_path){
                     
@@ -174,9 +180,9 @@ class MediaHandler {
     
     /**
      * Vyhľadá súbor v zložke definovanej konštantou MEDIA_PATH_UPLOADS a podzložke definovanej parametrom
-     * @param String $filename
-     * @param String $subfolder
-     * @return String | bool - absolútna cesta k súboru ak existuje | FALSE ak neexistuje
+     * @param string $filename
+     * @param string $subfolder
+     * @return string | bool - absolútna cesta k súboru ak existuje | FALSE ak neexistuje
      */
     private function file_find($filename, $subfolder){
         
@@ -190,8 +196,8 @@ class MediaHandler {
     /**
      * Metóda zistuje typ súboru 
      * @param type $filename
-     * @param String $ftype
-     * @param String $ctype
+     * @param string $ftype
+     * @param string $ctype
      */
     private function file_type($filename, &$ftype, &$ctype){
         
