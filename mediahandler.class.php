@@ -14,11 +14,102 @@ class MediaHandler {
     /**
      * Metóda generuje multimediálny výstup vo formáte image/gif, image/jpeg, image/png
      * 
+     * Nová verzia využívajúca knižnice Imagick aj GD
+     * Návod ako nainštalovať Imagick knižnicu je v orchidcore/models/ImageModel
+     * 
+     * @param string $filename Názov súboru
+     * @param string $size (image_bank, large, medium, small)
+     */
+    public function image_handle($filename, $size = NULL){
+               
+        $this->file_type($filename, $ftype, $ctype);
+        header('Content-type: ' . $ctype);
+        header('Cache-Control: max-age=86400');
+        
+        $wmflag  = 0;
+        
+        if(($fpath = $this->file_find($filename, $size)) !== FALSE){
+	    
+            $im = new \Imagick( $fpath );
+	    
+            switch ($size){
+            	case 'large':
+            		$wmflag = 2;
+            		break;
+            	case 'image_bank':
+            		$wmflag = 1;
+            		break;
+            	default:
+            		$wmflag = 0;
+            		break;
+            }
+        }
+        else{
+            readfile(MEDIA_PATH_DEFAULT_IMAGE);
+            return TRUE;
+        }
+        
+        //** Watermark
+        if(defined('MEDIA_IMAGE_WATERMARK') && $wmflag){
+            
+	    $watermarkPath = ( $wmflag == 2 ) ? MEDIA_IMAGE_WATERMARK_THUMB : MEDIA_IMAGE_WATERMARK ;
+	    $this->_imageWatermark( $im, $watermarkPath );
+
+        }
+        
+        //** Save
+        empty($size)? $size = 'image_bank' : FALSE;
+        $filepath = __DIR__ . '/files/' . $size . '/' . $filename;
+        
+        $this->_imageOutput( $im, $ftype, $filepath ); 
+        
+        echo $im;
+    }
+    
+    
+    private function _imageWatermark( &$im, $watermarkPath ){
+	
+	$watermark = new \Imagick( $watermarkPath );
+	$im->compositeImage($watermark, imagick::COMPOSITE_OVER, (((($im->getImageWidth()) - ($watermark->getImageWidth())))/2), (((($im->getImageHeight()) - ($watermark->getImageHeight())))/2) );
+	
+	return null;
+	
+    }
+    
+    private function _imageOutput( &$im, $extension, $outputPath ){
+	
+	$im->setSamplingFactors(array('2x2', '1x1', '1x1'));
+        $im->stripImage();
+	
+	/** @todo */
+        if (array_search(strtolower($extension), ['jpg', 'jpeg', 'jpe', 'jif', 'jfif', 'jfi']) !== false) {
+            $im->setcompression(\Imagick::COMPRESSION_JPEG);
+            $im->setimageformat("jpg");
+            $im->setimagecompressionquality(85);
+        } elseif (strtolower($extension) == 'png') {
+            $im->setimageformat("png");
+            $im->setimagecompressionquality(0);
+        } elseif (strtolower($extension) == 'gif') {
+            $im->setimageformat("gif");
+        }
+	
+	
+	$im->writeImage( $outputPath );
+	
+	return null;
+    }
+    
+    
+    /**
+     * Stará verzia využívajúca iba GD knižnicu.
+     * Metóda generuje multimediálny výstup vo formáte image/gif, image/jpeg, image/png
+     * 
      * @param string $filename Názov súboru
      * @param string $size (image_bank, large, medium, small)
      * @return bool TRUE pri uspešnom zobrazení obrázku (požadovaný alebo default), FALSE pri chybe
      */
-    public function image_handle($filename, $size = NULL){
+    
+    /*public function image_handle($filename, $size = NULL){
                
         $this->file_type($filename, $ftype, $ctype);
         header('Content-type: ' . $ctype);
@@ -111,7 +202,7 @@ class MediaHandler {
                 break;
             case "jpeg":
             case "jpg": 
-                    @imagejpeg($im, $filepath, 95);
+                    @imagejpeg($im, $filepath, 85);
                     imagejpeg($im);
                 break;
             case "png": 
