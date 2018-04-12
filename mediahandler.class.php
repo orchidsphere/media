@@ -277,7 +277,7 @@ class MediaHandler {
      */
     private function file_find($filename, $subfolder){
         
-        if(file_exists(MEDIA_PATH_UPLOADS . $subfolder . '/' . $filename)){
+        if(file_exists(MEDIA_PATH_UPLOADS . $subfolder . '/' . $filename) !is_dir(MEDIA_PATH_UPLOADS . $subfolder . '/' . $filename)){
             return MEDIA_PATH_UPLOADS . $subfolder . '/' . $filename;
         }
         
